@@ -1,0 +1,122 @@
+
+//Vinayak Kothari 14UCS144
+//Vikas Kaviyya 14UCS143
+//Shubham Sharma 14UCS120
+//Sudhanshu Singh 14UCS128
+
+
+
+
+#include<stdio.h>
+#include<string.h>
+
+char* Check_Two_Add(char*);
+char * Check_One_Add(char *);
+char * Check_Zero_Add(char*);
+char * Check_Reg(char*);
+char* Convert_Binary(int ); 
+
+char * Check_Label(char *);
+
+
+void Print_Error()
+{
+	char str[20];
+	scanf ("%[^\n]%*c", str);
+	printf("Error in above Line\n");
+}
+
+
+void Input_Values_Two_Add(FILE *f1,char *str1,char *opcode,int flag,int *execution)
+{
+	
+	if(strlen(opcode)==4 && flag==0)
+	{
+		if(atoi(str1)!=0 || strcmp(str1,"0")==0 )
+		{
+			fprintf(f1,"0000000000000000%s",Check_Two_Add(opcode));
+		   fprintf(f1,"%s",Convert_Binary(atoi(str1)));
+		}
+		else Print_Error();
+	}
+	else	if(strcmp(Check_Reg(str1),"-1")!=0 && flag==1)
+	{
+
+		fprintf(f1,"%s",Check_Reg(str1));
+		fprintf(f1,"\n");
+		(*execution)++;
+	}
+	else	if(strcmp(Check_Reg(str1),"-1")!=0 && flag==0)
+	{
+		fprintf(f1,"0000000000000000%s",Check_Two_Add(opcode));
+		fprintf(f1,"%s",Check_Reg(str1));
+	}
+	else Print_Error();
+}
+
+void Input_Values_One_Add(FILE *f1,char *value,char *str1,int *execution)
+{
+	if(strcmp(Check_Label(value),"-1")!=0 && (strcmp("JMP",str1)==0 || strcmp("JNE",str1)==0 || strcmp("JEQ",str1)==0 || strcmp("JLT",str1)==0 || strcmp("JGT",str1)==0))
+	{
+		fprintf(f1,"0000000000000000%s",Check_One_Add(str1));
+		fprintf(f1,"%s",Check_Label(value));
+		fprintf(f1,"\n");
+		(*execution)++;
+	}
+	else if(strcmp(Check_Reg(value),"-1")!=0 && (strcmp("IN",str1)==0 || strcmp("OUT",str1)==0) )
+	{
+		fprintf(f1,"0000000000000000%s",Check_One_Add(str1));
+		fprintf(f1,"%s",Check_Reg(value));
+		fprintf(f1,"\n");
+		(*execution)++;
+	}
+	else Print_Error();
+}
+void Take_Input(FILE *f1,FILE *f2)
+{
+	char str1[100],str2[100],str3[100],str4[100],str5[100],value1[100],value2[100];
+	int execution =1;
+	do{
+		scanf("%s",str1);
+		strcpy(str2,Check_Two_Add(str1));
+		strcpy(str3,Check_One_Add(str1));
+		strcpy(str4,Check_Zero_Add(str1));
+		strcpy(str5,Check_Label(str1));
+		if(strcmp(str2,"-1")!=0)
+		{
+			scanf("%s%s",value1,value2);
+			Input_Values_Two_Add(f1,value1,str1,0,&execution);
+			Input_Values_Two_Add(f1,value2,str1,1,&execution);	
+		}
+		else if(strcmp(str3,"-1")!=0)
+		{
+			scanf("%s",value1);
+			Input_Values_One_Add(f1,value1,str1,&execution);
+		}
+		else if(strcmp(str4,"-1")!=0)
+		{
+			fprintf(f1,"0000000000000000%s",Check_Zero_Add(str1));
+			fprintf(f1,"\n");
+			execution++;
+		}
+		else if(strcmp(str5,"-1")!=0)
+		{
+			fprintf(f2,"%s %d",str5,execution);
+			fprintf(f2,"\n");
+		}
+		else 
+		{
+			Print_Error();
+		}		
+	}while(strcmp(str1,"HLT")!=0);
+}			
+int main()
+{
+	FILE *f1,*f2;
+	f1=fopen("Binary.txt","w");
+	f2=fopen("SymbolTable.txt","w");
+	Take_Input(f1,f2);
+	fclose(f1);
+	fclose(f2);
+	return 0;
+}

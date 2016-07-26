@@ -1,0 +1,32 @@
+#include<stdio.h>
+#include<string.h>
+#include<stdlib.h>
+#define N 25
+
+int Reg_No[N];
+
+void initialise()
+{
+	int i;
+	for(i=0;i<25;i++)
+		Reg_No[i]=0;
+}
+
+int main()
+{
+	initialise();
+	char read;
+	FILE *f1=fopen("Binary.txt","r");
+
+	char *line=(char*)malloc(34*sizeof(char));
+	if(feof(f1)!=1)
+	{
+		
+		size_t len=32;
+		while(read=getline(&line,&len,f1)!=-1)
+		{
+			check_str(line,f1,Reg_No);
+		}
+	}	
+	return 0;
+}	
